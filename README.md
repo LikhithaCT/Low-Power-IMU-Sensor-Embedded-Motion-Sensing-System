@@ -190,9 +190,10 @@ The project report specifically identifies custom RTL implementation of filterin
 The complete project report and presentation are available in the docs/ directory.
 
 ##👩‍💻 Project Team
-Likhitha CT
+
 Sahana T S
 Kruthika RG
+Likhitha CT
 Sahana A
 
 Department of Electronics & Communication Engineering
