@@ -1,0 +1,175 @@
+#include <Wire.h>
+#include <avr/sleep.h>
+#include <avr/power.h>
+
+const int MPU_ADDR = 0x68;
+const int INT_PIN = 2;
+
+volatile bool motionDetected = false;
+unsigned long lastMotionTime = 0;
+const unsigned long MOTION_TIMEOUT = 5000;
+
+int16_t AcX, AcY, AcZ, Temp, GyX, GyY, GyZ;
+
+void setup() {
+  Serial.begin(115200);
+  Wire.begin();
+
+  pinMode(INT_PIN, INPUT);
+
+  initializeMPU6050();
+
+  configureMPU6050MotionDetection();
+
+  attachInterrupt(digitalPinToInterrupt(INT_PIN), motionISR, RISING);
+
+  Serial.println("Low-Power IMU System Initialized");
+  Serial.println("Motion detection threshold set");
+  Serial.println("System will sleep after 5s of no motion");
+  Serial.println("--------------------------------");
+}
+
+void loop()
+{
+  if (motionDetected || (millis() - lastMotionTime < MOTION_TIMEOUT))
+  {
+    motionDetected = false;
+    readMPU6050Data();
+    printSensorData();
+
+    if (abs(GyX) > 100 || abs(GyY) > 100 || abs(GyZ) > 100 ||
+        abs(AcX - 1024) > 500 || abs(AcY + 512) > 500) {
+      lastMotionTime = millis();
+    }
+
+    delay(50);
+  }
+  else
+  {
+    enterSleepMode();
+  }
+}
+
+void initializeMPU6050()
+{
+  writeRegister(0x6B, 0x00);
+  delay(100);
+
+  writeRegister(0x1C, 0x00);
+  writeRegister(0x1B, 0x00);
+  writeRegister(0x19, 0x04);
+  writeRegister(0x1A, 0x04);
+}
+
+void configureMPU6050MotionDetection() {
+  writeRegister(0x1F, 0x01);
+  writeRegister(0x1F, 20);
+  writeRegister(0x20, 20);
+  writeRegister(0x38, 0x40);
+  writeRegister(0x37, 0x20);
+}
+
+void enterSleepMode()
+{
+  Serial.println("\n==============================");
+  Serial.println("Entering LOW-POWER SLEEP mode...");
+  Serial.println("==============================");
+  Serial.flush();
+  delay(100);
+
+  readMPU6050Register(0x3A);
+  writeRegister(0x6B, 0x20);
+
+  power_adc_disable();
+  power_spi_disable();
+  power_timer1_disable();
+  power_timer2_disable();
+
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  sleep_enable();
+
+  sleep_mode();
+
+  sleep_disable();
+  power_all_enable();
+
+  writeRegister(0x6B, 0x00);
+  delay(50);
+
+  uint8_t intStatus = readMPU6050Register(0x3A);
+
+  Serial.println("\n==============================");
+  Serial.println("WAKE UP from sleep - Motion detected!");
+  Serial.print("Post-wake INT_STATUS: 0x");
+  Serial.println(intStatus, HEX);
+  Serial.println("==============================\n");
+
+  lastMotionTime = millis();
+  motionDetected = true;
+}
+
+void motionISR()
+{
+  motionDetected = true;
+}
+
+void readMPU6050Data()
+{
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x3B);
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU_ADDR, 14, true);
+
+  AcX = Wire.read() << 8 | Wire.read();
+  AcY = Wire.read() << 8 | Wire.read();
+  AcZ = Wire.read() << 8 | Wire.read();
+  Temp = Wire.read() << 8 | Wire.read();
+  GyX = Wire.read() << 8 | Wire.read();
+  GyY = Wire.read() << 8 | Wire.read();
+  GyZ = Wire.read() << 8 | Wire.read();
+}
+
+void printSensorData()
+{
+  Serial.print("ACC: X=");
+  Serial.print(AcX);
+  Serial.print(" Y=");
+  Serial.print(AcY);
+  Serial.print(" Z=");
+  Serial.print(AcZ);
+  Serial.print(" | GYRO: X=");
+  Serial.print(GyX);
+  Serial.print(" Y=");
+  Serial.print(GyY);
+  Serial.print(" Z=");
+  Serial.println(GyZ);
+
+  Serial.print(AcX);
+  Serial.print(",");
+  Serial.print(AcY);
+  Serial.print(",");
+  Serial.print(AcZ);
+  Serial.print(",");
+  Serial.print(GyX);
+  Serial.print(",");
+  Serial.print(GyY);
+  Serial.print(",");
+  Serial.println(GyZ);
+}
+
+void writeRegister(uint8_t reg, uint8_t value)
+{
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(reg);
+  Wire.write(value);
+  Wire.endTransmission(true);
+}
+
+uint8_t readMPU6050Register(uint8_t reg)
+{
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(reg);
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU_ADDR, 1, true);
+  return Wire.read();
+}
