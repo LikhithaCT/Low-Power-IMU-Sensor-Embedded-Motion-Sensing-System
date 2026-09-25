@@ -75,7 +75,7 @@ During active motion, accelerometer and gyroscope data are acquired through I²C
 - External interrupt
 - Low-power sleep modes
 
-### 💻 Software
+## 💻 Software
 
 -Arduino IDE
 -Embedded C/C++
@@ -84,7 +84,7 @@ During active motion, accelerometer and gyroscope data are acquired through I²C
 -Arduino Serial Monitor
 -Arduino Serial Plotter
 
-### ⚙️ Working Principle
+## ⚙️ Working Principle
 
 -The MPU6050 is initialized and configured.
 -Motion detection thresholds are configured.
@@ -97,7 +97,7 @@ During active motion, accelerometer and gyroscope data are acquired through I²C
 -The data is displayed using the Serial Plotter.
 -After a predefined period of inactivity, the Arduino returns to sleep mode.
 
-###🔌 Interface
+##🔌 Interface
 
 -MPU6050 → Arduino Uno
 -MPU6050	Arduino Uno
@@ -107,7 +107,7 @@ During active motion, accelerometer and gyroscope data are acquired through I²C
 -SCL	A5
 -INT	Digital Pin 2
 
-### 📊 Motion Data
+## 📊 Motion Data
 
 The system acquires six motion parameters:
 
@@ -120,7 +120,7 @@ GyZ – Z-axis angular velocity
 
 These values are visualized as real-time waveforms using the Arduino Serial Plotter.
 
-###🔋 Low-Power Technique
+##🔋 Low-Power Technique
 
 The main power-saving technique is event-driven operation.
 
@@ -148,7 +148,7 @@ Arduino Sleep
 
 Unused Arduino peripherals such as ADC, SPI and timers can also be disabled during sleep to reduce power consumption.
 
-### 📈 Results
+## 📈 Results
 
 The implemented system demonstrates:
 
@@ -161,7 +161,7 @@ Interrupt-driven motion detection
 
 The project report documents wake-up latency below 100 ms and 20 Hz sampling during active periods under the reported test setup.
 
-### 🚀 Applications
+## 🚀 Applications
 -Wearable devices
 -Fitness trackers
 -AR/VR motion tracking
@@ -171,7 +171,7 @@ The project report documents wake-up latency below 100 ms and 20 Hz sampling dur
 -Portable electronics
 -IoT devices
 
-### 🔮 Future Scope
+## 🔮 Future Scope
 
 Possible improvements include:
 
@@ -185,11 +185,11 @@ Integration into a low-power SoC
 
 The project report specifically identifies custom RTL implementation of filtering, motion classification and wake-up detection as a future direction toward a dedicated low-power SoC.
 
-### 📚 Documentation
+## 📚 Documentation
 
 The complete project report and presentation are available in the docs/ directory.
 
-###👩‍💻 Project Team
+##👩‍💻 Project Team
 Likhitha CT
 Sahana T S
 Kruthika RG
@@ -198,10 +198,10 @@ Sahana A
 Department of Electronics & Communication Engineering
 Atria Institute of Technology, Bengaluru
 
-### Project Type
+## Project Type
 
 Academic Mini Project
 Visvesvaraya Technological University (VTU)
 
-Technologies: Arduino MPU6050 Embedded C/C++ I²C Interrupts Low-Power Design Wearable Systems
+**Technologies:** `Arduino` `MPU6050` `Embedded C/C++` `I²C` `Interrupts` `Low-Power Design` `Wearable Systems`
 
